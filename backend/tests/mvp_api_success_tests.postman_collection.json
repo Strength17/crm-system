@@ -1,0 +1,201 @@
+{
+  "info": {
+    "name": "CRM API — Success Suite",
+    "_postman_id": "success-suite",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login Success",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{BASE_URL}}/auth/login",
+        "body": { "mode": "raw", "raw": "{\"email\":\"{{EMAIL}}\",\"password\":\"{{PASSWORD}}\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Login 200 and token present', function () {",
+          "  pm.response.to.have.status(200);",
+          "  var j = pm.response.json();",
+          "  pm.expect(j).to.have.property('token');",
+          "  pm.environment.set('AUTH_TOKEN', j.token);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Create Prospect",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/prospects",
+        "body": { "mode": "raw", "raw": "{\"name\":\"ACME Corp\",\"email\":\"prospect1@example.com\",\"status\":\"new\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Prospect created successfully', function () {",
+          "  pm.response.to.have.status(201);",
+          "  var j = pm.response.json();",
+          "  pm.expect(j).to.have.property('id');",
+          "  pm.environment.set('PROSPECT_ID', j.id);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "List Prospects",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
+        "url": "{{BASE_URL}}/prospects"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Prospects list returns array', function () {",
+          "  pm.response.to.have.status(200);",
+          "  var arr = pm.response.json();",
+          "  pm.expect(arr).to.be.an('array');",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Create Interaction",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/interactions",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":{{PROSPECT_ID}},\"channel\":\"email\",\"type\":\"outbound\",\"attempt_number\":1,\"content\":\"Intro email\",\"response_type\":\"opened\",\"success\":1}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Interaction created successfully', function () {",
+          "  pm.response.to.have.status(201);",
+          "  var j = pm.response.json();",
+          "  pm.expect(j).to.have.property('id');",
+          "  pm.environment.set('INTERACTION_ID', j.id);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "List Interactions",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
+        "url": "{{BASE_URL}}/interactions"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Interactions list returns array', function () {",
+          "  pm.response.to.have.status(200);",
+          "  var arr = pm.response.json();",
+          "  pm.expect(arr).to.be.an('array');",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Create Deal",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/deals",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":{{PROSPECT_ID}},\"deal_value\":15000.5,\"stage\":\"initiated\",\"stage_reason\":\"Initial interest\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Deal created successfully', function () {",
+          "  pm.response.to.have.status(201);",
+          "  var j = pm.response.json();",
+          "  pm.expect(j).to.have.property('id');",
+          "  pm.environment.set('DEAL_ID', j.id);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "List Deals",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
+        "url": "{{BASE_URL}}/deals"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Deals list returns array', function () {",
+          "  pm.response.to.have.status(200);",
+          "  var arr = pm.response.json();",
+          "  pm.expect(arr).to.be.an('array');",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Create Payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":{{DEAL_ID}},\"amount\":15000.5,\"method\":\"stripe\",\"status\":\"pending\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Payment created successfully', function () {",
+          "  pm.response.to.have.status(201);",
+          "  var j = pm.response.json();",
+          "  pm.expect(j).to.have.property('id');",
+          "  pm.environment.set('PAYMENT_ID', j.id);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "List Payments",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
+        "url": "{{BASE_URL}}/payments"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Payments list returns array', function () {",
+          "  pm.response.to.have.status(200);",
+          "  var arr = pm.response.json();",
+          "  pm.expect(arr).to.be.an('array');",
+          "});"
+        ] }
+      }]
+    }
+  ]
+}

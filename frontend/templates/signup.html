@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up — CRM System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { --color-bg: #0f172a; }
+    .bg-app { background: var(--color-bg); }
+    .valid { color: #22c55e; }   /* green check */
+    .invalid { color: #ef4444; } /* red cross */
+  </style>
+</head>
+<body class="bg-app min-h-screen flex items-center justify-center">
+
+  <div class="bg-white/10 p-8 rounded-xl shadow-lg w-full max-w-md">
+    <!-- Logo placeholder -->
+    <a href="{{url_for('auth.index')}}">
+      <div class="flex items-center justify-center gap-3 mb-6">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-9 h-13 " />
+        <div class="text-white font-semibold text-lg">CRM System</div>
+      </div>
+    </a>
+
+    <h1 class="text-white text-3xl font-bold mb-6 text-center">Create Account</h1>
+    <form id="signupForm" class="space-y-4">
+      <div class="flex gap-4">
+        <input type="text" id="firstName" placeholder="First Name"
+          class="w-1/2 px-4 py-2 rounded-md bg-white/5 text-white border border-white/20 focus:outline-none focus:border-cyan-400" required>
+        <input type="text" id="lastName" placeholder="Last Name"
+          class="w-1/2 px-4 py-2 rounded-md bg-white/5 text-white border border-white/20 focus:outline-none focus:border-cyan-400" required>
+      </div>
+      <input type="email" id="signupEmail" placeholder="Email Address"
+        class="w-full px-4 py-2 rounded-md bg-white/5 text-white border border-white/20 focus:outline-none focus:border-cyan-400" required>
+
+      <!-- Password -->
+      <div class="relative">
+        <input type="password" id="signupPassword" placeholder="Password"
+          class="w-full px-4 py-2 rounded-md bg-white/5 text-white border border-white/20 focus:outline-none focus:border-cyan-400 pr-10" required>
+        <button type="button" onclick="togglePassword('signupPassword','signupIcon')"
+          class="absolute right-2 top-2 text-gray-400">
+          <svg id="signupIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path d="M2.458 12C3.732 7.943 7.523 5 12 5
+                     c4.477 0 8.268 2.943 9.542 7
+                     -1.274 4.057-5.065 7-9.542 7
+                     -4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="relative">
+        <input type="password" id="confirmPassword" placeholder="Confirm Password"
+          class="w-full px-4 py-2 rounded-md bg-white/5 text-white border border-white/20 focus:outline-none focus:border-cyan-400 pr-10" required>
+        <button type="button" onclick="togglePassword('confirmPassword','confirmIcon')"
+          class="absolute right-2 top-2 text-gray-400">
+          <svg id="confirmIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path d="M2.458 12C3.732 7.943 7.523 5 12 5
+                     c4.477 0 8.268 2.943 9.542 7
+                     -1.274 4.057-5.065 7-9.542 7
+                     -4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Validation cues -->
+      <ul class="text-sm space-y-1">
+        <li id="length" class="invalid">✗ At least 8 characters</li>
+        <li id="uppercase" class="invalid">✗ Contains uppercase letter</li>
+        <li id="lowercase" class="invalid">✗ Contains lowercase letter</li>
+        <li id="digit" class="invalid">✗ Contains digit</li>
+        <li id="symbol" class="invalid">✗ Contains symbol</li>
+        <li id="match" class="invalid">✗ Passwords match</li>
+      </ul>
+
+      <button id="signupBtn" type="submit" disabled
+        class="w-full py-3 rounded-md bg-gradient-to-r from-cyan-400 to-blue-400 text-black font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+        Sign Up
+      </button>
+    </form>
+
+    <div class="mt-4 text-sm text-gray-400 text-center">
+      <a href="{{ url_for('auth.login_page') }}" class="hover:text-white">Already have an account? Log in</a>
+    </div>
+  </div>
+
+
+  <script>
+    function togglePassword(fieldId, iconId) {
+      const field = document.getElementById(fieldId);
+      const icon = document.getElementById(iconId);
+      if (field.type === "password") {
+        field.type = "text";
+        icon.innerHTML = `<path d="M13.875 18.825A10.05 10.05 0 0112 19
+                           c-4.477 0-8.268-2.943-9.542-7
+                           a9.956 9.956 0 012.642-4.362M9.88 9.88
+                           a3 3 0 104.24 4.24"/><path d="M3 3l18 18"/>`;
+      } else {
+        field.type = "password";
+        icon.innerHTML = `<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                          <path d="M2.458 12C3.732 7.943 7.523 5 12 5
+                                   c4.477 0 8.268 2.943 9.542 7
+                                   -1.274 4.057-5.065 7-9.542 7
+                                   -4.477 0-8.268-2.943-9.542-7z"/>`;
+      }
+    }
+
+    const password = document.getElementById('signupPassword');
+    const confirm = document.getElementById('confirmPassword');
+    const signupBtn = document.getElementById('signupBtn');
+    const signupForm = document.getElementById('signupForm');
+
+    function validatePassword() {
+      const val = password.value;
+      const checks = {
+        length: val.length >= 8,
+        uppercase: /[A-Z]/.test(val),
+        lowercase: /[a-z]/.test(val),
+        digit: /[0-9]/.test(val),
+        symbol: /[^A-Za-z0-9]/.test(val),
+        match: val && val === confirm.value
+      };
+      for (let key in checks) {
+        const el = document.getElementById(key);
+        if (checks[key]) {
+          el.classList.remove('invalid'); el.classList.add('valid'); el.textContent = "✓ " + el.textContent.slice(2);
+        } else {
+          el.classList.remove('valid'); el.classList.add('invalid'); el.textContent = "✗ " + el.textContent.slice(2);
+        }
+      }
+      signupBtn.disabled = !Object.values(checks).every(Boolean) || !signupForm.checkValidity();
+    }
+
+    password.addEventListener('input', validatePassword);
+    confirm.addEventListener('input', validatePassword);
+    signupForm.addEventListener('input', validatePassword);
+  </script>
+
+<script>
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('firstName').value + " " + document.getElementById('lastName').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+
+    try {
+      const res = await fetch('/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        // clear all input boxes
+        signupForm.reset();
+        // also reset validation cues
+        document.querySelectorAll('#length,#uppercase,#lowercase,#digit,#symbol,#match').forEach(el => {
+          el.classList.remove('valid');
+          el.classList.add('invalid');
+          el.textContent = "✗ " + el.textContent.slice(2);
+        });
+
+        localStorage.setItem("pendingEmail", email); 
+        window.location.href = "/auth/verify-code";
+      } else {
+        alert(data.error || "Signup failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network error");
+    }
+  });
+</script>
+
+
+</body>
+</html>

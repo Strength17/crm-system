@@ -1,0 +1,141 @@
+{
+  "info": {
+    "name": "CRM API — Injection Suite",
+    "_postman_id": "injection-suite",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login (injection)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{BASE_URL}}/auth/login",
+        "body": { "mode": "raw", "raw": "{\"email\":\"{{EMAIL}}\",\"password\":\"{{PASSWORD}}\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Login OK', function () {",
+          "  pm.response.to.have.status(200);",
+          "  pm.environment.set('AUTH_TOKEN', pm.response.json().token);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Prospect name forbidden chars",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/prospects",
+        "body": { "mode": "raw", "raw": "{\"name\":\"Bad;Name\",\"email\":\"inject@example.com\",\"status\":\"new\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('400 forbidden chars in name', function () { pm.response.to.have.status(400); });"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Prospect email SQL injection attempt",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/prospects",
+        "body": { "mode": "raw", "raw": "{\"name\":\"SafeName\",\"email\":\"admin' OR 1=1 --\",\"status\":\"new\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('400 forbidden chars in email', function () { pm.response.to.have.status(400); });"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Interaction content XSS attempt",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/interactions",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":0,\"channel\":\"email\",\"type\":\"outbound\",\"attempt_number\":1,\"content\":\"<script>alert(1)</script>\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('400 forbidden in content', function () { pm.response.to.have.status(400); });"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Deal stage_reason SQL injection attempt",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/deals",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":0,\"deal_value\":10,\"stage\":\"initiated\",\"stage_reason\":\"DROP TABLE deals;\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('400 forbidden in stage_reason', function () { pm.response.to.have.status(400); });"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Payment method injection attempt",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":0,\"amount\":10,\"method\":\"man;ual\",\"status\":\"pending\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('400 forbidden in method', function () { pm.response.to.have.status(400); });"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Payment status injection attempt",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":0,\"amount\":10,\"method\":\"stripe\",\"status\":\"comp<script>\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('400 forbidden in status', function () { pm.response.to.have.status(400); });"
+        ] }
+      }]
+    }
+  ]
+}

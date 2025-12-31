@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI CRM — Landing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --color-bg: #0f172a;
+      --color-primary: #22d3ee;
+      --color-accent: #60a5fa;
+      --color-text: #e5e7eb;
+      --color-muted: #94a3b8;
+    }
+    .bg-app {
+      background: linear-gradient(135deg, rgba(34,211,238,0.15), rgba(96,165,250,0.15)),
+                  var(--color-bg);
+    }
+  </style>
+</head>
+<body class="bg-app text-app antialiased">
+
+  <!-- Header -->
+  <header class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+    <a href="{{url_for('auth.index')}}">
+      <div class="flex items-center gap-3">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-8 h-11 " />
+        <div class="text-white font-semibold">CRM System</div>
+      </div>
+    </a>
+    <nav class="hidden md:flex items-center gap-6">
+      <a href="#features" class="text-gray-400 hover:text-white">Features</a>
+      <a href="#how" class="text-gray-400 hover:text-white">How it works</a>
+      <a href="#contact" class="text-gray-400 hover:text-white">Contact</a>
+      <a href="{{url_for('auth.login_page')}}" class="px-4 py-2 rounded-md bg-white/10 text-white hover:bg-white/20">Sign in</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+    <!-- Text -->
+    <div>
+      <h1 class="text-white text-4xl sm:text-5xl font-extrabold leading-tight">
+        The Smartest Way to Track, Learn, and Close Deals — From Prospect to Payment.
+      </h1>
+      <p class="text-gray-400 mt-5 text-lg sm:text-xl max-w-2xl">
+        A lightweight CRM System to track prospects, log interactions, and visualize your business pipeline — all in one place.
+      </p>
+      <div class="mt-8 flex gap-4">
+        <a href="{{url_for('auth.signup_page')}}" class="px-5 py-3 rounded-md bg-gradient-to-r from-cyan-400 to-blue-400 text-black font-semibold">Get started</a>
+        <a href="#features" class="px-5 py-3 rounded-md bg-white/10 text-white hover:bg-white/20">Explore features</a>
+      </div>
+    </div>
+
+    <!-- Visual Database with Orbiting Icons -->
+    <div class="relative flex justify-center items-center">
+      <!-- Central Database Illustration -->
+      <img src="{{ url_for('static', filename='database_illustration.svg') }}" alt="Database Illustration" class="w-full max-w-md z-10" />
+
+      <!-- Orbiting Icons -->
+      <!-- Prospects -->
+      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-8 bg-gradient-to-r from-cyan-400 to-blue-400 p-3 rounded-full shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path d="M5.121 17.804A9.969 9.969 0 0112 15c2.21 0 4.236.72 5.879 1.929M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+      </div>
+      <!-- Interactions -->
+      <div class="absolute right-0 top-1/3 transform translate-x-8 bg-gradient-to-r from-blue-400 to-indigo-400 p-3 rounded-full shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.83L3 20l1.83-3.17A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        </svg>
+      </div>
+      <!-- Deals -->
+      <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-8 bg-gradient-to-r from-teal-400 to-green-400 p-3 rounded-full shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path d="M3 7h18M3 12h12M3 17h6"/>
+        </svg>
+      </div>
+      <!-- Payments -->
+      <div class="absolute left-0 top-1/3 transform -translate-x-8 bg-gradient-to-r from-pink-400 to-purple-400 p-3 rounded-full shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div class="bg-white/10 p-6 rounded-lg text-center">
+      <h3 class="text-white font-semibold mb-2">Prospect Tracking</h3>
+      <p class="text-gray-400">Store and manage leads with clarity and structure.</p>
+    </div>
+    <div class="bg-white/10 p-6 rounded-lg text-center">
+      <h3 class="text-white font-semibold mb-2">Interaction Logging</h3>
+      <p class="text-gray-400">Track every call, email, and WhatsApp message.</p>
+    </div>
+    <div class="bg-white/10 p-6 rounded-lg text-center">
+      <h3 class="text-white font-semibold mb-2">Visual Dashboards</h3>
+      <p class="text-gray-400">See your pipeline, deals, and payments at a glance.</p>
+    </div>
+    <div class="bg-white/10 p-6 rounded-lg text-center">
+      <h3 class="text-white font-semibold mb-2">Secure Auth</h3>
+      <p class="text-gray-400">OTP verification, JWT login, and API key access.</p>
+    </div>
+  </section>
+
+  <!-- Server Illustration Section -->
+  <section class="max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+    <div class="flex justify-center">
+      <img src="{{ url_for('static', filename='server_illustration.svg') }}" alt="Server Illustration" class="w-full max-w-md" />
+    </div>
+    <div>
+      <h2 class="text-white text-3xl font-bold mb-4">Built for Scale</h2>
+      <p class="text-gray-400 text-lg">
+        Our CRM System is powered by a robust database and server architecture, ensuring your business data is secure, scalable, and always available.
+      </p>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section id="how" class="max-w-7xl mx-auto px-6 py-20">
+    <h2 class="text-white text-3xl font-bold mb-8 text-center">How It Works</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="bg-white/10 p-6 rounded-lg text-center">
+        <h3 class="text-white font-semibold mb-2">1. Sign up</h3>
+        <p class="text-gray-400">Verify your email and create your account.</p>
+      </div>
+      <div class="bg-white/10 p-6 rounded-lg text-center">
+        <h3 class="text-white font-semibold mb-2">2. Add Prospects</h3>
+        <p class="text-gray-400">Input your leads and start tracking interactions.</p>
+      </div>
+      <div class="bg-white/10 p-6 rounded-lg text-center">  
+        <h3 class="text-white font-semibold mb-2">3. Close Deals</h3>
+        <p class="text-gray-400">Manage your pipeline and process payments seamlessly.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contact" class="max-w-7xl mx-auto px-6
+    py-10 border-t border-gray-800 text-center">
+    <p class="text-gray-400">© 2026 CRM System. All rights reserved.</p>
+    <p class="text-gray-400 mt-2">Contact us: <a href="mailto:awapenn17@gmail.com" class="text-gray-300 hover:text-white">awapenn17@gmail.com</a></p> 
+  </footer>
+
+</body>
+</html>

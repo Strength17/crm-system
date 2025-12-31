@@ -1,0 +1,294 @@
+{
+  "info": {
+    "name": "CRM API — Failure Suite",
+    "_postman_id": "failure-suite",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login (failures)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{BASE_URL}}/auth/login",
+        "body": { "mode": "raw", "raw": "{\"email\":\"{{EMAIL}}\",\"password\":\"{{PASSWORD}}\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Login OK', function () {",
+          "  pm.response.to.have.status(200);",
+          "  pm.environment.set('AUTH_TOKEN', pm.response.json().token);",
+          "});"
+        ] }
+      }]
+    },
+
+
+
+    {
+      "name": "Prospect missing email",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/prospects",
+        "body": { "mode": "raw", "raw": "{\"name\":\"NoEmail\",\"status\":\"new\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 missing email', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Prospect invalid status",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/prospects",
+        "body": { "mode": "raw", "raw": "{\"name\":\"Bad\",\"email\":\"bad@example.com\",\"status\":\"unknown\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 invalid status', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Prospect forbidden characters in name",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/prospects",
+        "body": { "mode": "raw", "raw": "{\"name\":\"Bad;Name\",\"email\":\"bad@example.com\",\"status\":\"new\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 forbidden chars in name', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+
+
+
+    {
+      "name": "Interaction missing content",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/interactions",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":0,\"channel\":\"email\",\"type\":\"outbound\",\"attempt_number\":1}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 missing content', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Interaction invalid channel",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/interactions",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":0,\"channel\":\"fax\",\"type\":\"outbound\",\"attempt_number\":1,\"content\":\"x\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 invalid channel', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Interaction forbidden content",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/interactions",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":0,\"channel\":\"email\",\"type\":\"outbound\",\"attempt_number\":1,\"content\":\"<script>alert(1)</script>\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 forbidden content', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+
+
+
+    {
+      "name": "Deal missing stage",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/deals",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":0,\"deal_value\":1000}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 missing stage', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Deal invalid stage",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/deals",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":0,\"deal_value\":1000,\"stage\":\"invalid\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 invalid stage', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Deal forbidden stage_reason",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/deals",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":0,\"deal_value\":1000,\"stage\":\"initiated\",\"stage_reason\":\"<script>\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 forbidden stage_reason', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Deal FK violation (unknown prospect)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/deals",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":999999,\"deal_value\":1000,\"stage\":\"initiated\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('404 prospect not found', function () { pm.response.to.have.status(404); });"
+      ] } }]
+    },
+
+
+
+    {
+      "name": "Payment missing method",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":0,\"amount\":100,\"status\":\"pending\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 missing method', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Payment missing status",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":0,\"amount\":100,\"method\":\"stripe\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 missing status', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Payment invalid method",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":0,\"amount\":100,\"method\":\"cash\",\"status\":\"pending\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 invalid method', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Payment invalid status",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":0,\"amount\":100,\"method\":\"stripe\",\"status\":\"unknown\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 invalid status', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Payment forbidden characters in method",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":0,\"amount\":100,\"method\":\"man;ual\",\"status\":\"pending\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 forbidden chars in method', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Payment forbidden characters in status",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":0,\"amount\":100,\"method\":\"stripe\",\"status\":\"pend;ing\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('400 forbidden chars in status', function () { pm.response.to.have.status(400); });"
+      ] } }]
+    },
+    {
+      "name": "Payment FK violation (unknown deal)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":999999,\"amount\":100,\"method\":\"stripe\",\"status\":\"pending\"}" }
+      },
+      "event": [{ "listen": "test", "script": { "exec": [
+        "pm.test('404 deal not found', function () { pm.response.to.have.status(404); });"
+      ] } }]
+    }
+  ]
+}

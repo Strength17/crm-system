@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Validate email — CRM System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { --color-bg: #0f172a; }
+    .bg-app { background: var(--color-bg); }
+    .glow {
+      box-shadow: 0 0 8px 2px rgba(34,211,238,0.7);
+      border-color: rgba(34,211,238,0.9);
+    }
+    .placeholder-style::placeholder {
+      color: #94a3b8;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-app min-h-screen flex items-center justify-center px-4">
+
+  <div class="bg-white/10 p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-md text-center">
+    <!-- Logo + Name -->
+    <a href="{{url_for('auth.index')}}">
+      <div class="flex items-center justify-center gap-3 mb-6">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-9 h-13 " />
+        <div class="text-white font-semibold text-lg">CRM System</div>
+      </div>
+    </a>
+
+    <!-- Email box -->
+    <div class="border border-white/20 rounded-md px-4 py-2 mb-4 text-white text-sm" id="emailBox">
+      email@gmail.com
+    </div>
+
+    <h1 class="text-white text-2xl font-bold mb-2">Enter your code</h1>
+    <p class="text-gray-400 mb-6 text-sm">Enter the 6-digit code we sent to your email</p>
+
+    <!-- Code input boxes -->
+    <div class="flex justify-center gap-6">
+      <div class="flex gap-3">
+        <input type="text" maxlength="1" placeholder="-" class="codeBox placeholder-style w-12 h-12 text-center text-white text-xl rounded-md bg-white/5 border border-white/20 focus:outline-none focus:border-cyan-400" />
+        <input type="text" maxlength="1" placeholder="-" class="codeBox placeholder-style w-12 h-12 text-center text-white text-xl rounded-md bg-white/5 border border-white/20 focus:outline-none focus:border-cyan-400" />
+        <input type="text" maxlength="1" placeholder="-" class="codeBox placeholder-style w-12 h-12 text-center text-white text-xl rounded-md bg-white/5 border border-white/20 focus:outline-none focus:border-cyan-400" />
+      </div>
+      <div class="flex gap-3">
+        <input type="text" maxlength="1" placeholder="-" class="codeBox placeholder-style w-12 h-12 text-center text-white text-xl rounded-md bg-white/5 border border-white/20 focus:outline-none focus:border-cyan-400" />
+        <input type="text" maxlength="1" placeholder="-" class="codeBox placeholder-style w-12 h-12 text-center text-white text-xl rounded-md bg-white/5 border border-white/20 focus:outline-none focus:border-cyan-400" />
+        <input type="text" maxlength="1" placeholder="-" class="codeBox placeholder-style w-12 h-12 text-center text-white text-xl rounded-md bg-white/5 border border-white/20 focus:outline-none focus:border-cyan-400" />
+      </div>
+    </div>
+
+    <!-- Error message --> 
+    <p id="errorMsg" class="mt-4 text-sm text-red-500"></p>
+
+    <!-- Verify button -->
+    <button id="verifyBtn" disabled
+      class="mt-8 w-full py-3 rounded-md bg-gradient-to-r from-cyan-400 to-blue-400 text-black font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+      Verify Code
+    </button>
+
+    <!-- Resend code section -->
+    <div class="mt-4 text-sm text-gray-400">
+      <button id="resendBtn" disabled
+        class="px-4 py-2 rounded-md border border-white/20 text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed">
+        Resend Code <span id="timer"></span>
+      </button>
+    </div>
+
+    <!-- Success modal -->
+    <div id="resendModal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-green-500 text-white px-6 py-4 rounded-md shadow-lg">
+        OTP has been resent successfully!
+      </div>
+    </div>
+  </div>
+
+<script>
+  const boxes = document.querySelectorAll('.codeBox');
+  const verifyBtn = document.getElementById('verifyBtn');
+  const resendBtn = document.getElementById('resendBtn');
+  const timerSpan = document.getElementById('timer');
+  const errorMsg = document.getElementById('errorMsg');
+  const resendModal = document.getElementById('resendModal');
+  const email = localStorage.getItem("pendingEmail") || document.getElementById("emailBox").textContent.trim();
+
+  if (email) {
+    document.getElementById("emailBox").textContent = email;
+  }
+
+  function clearBoxes() {
+    boxes.forEach(box => {
+      box.value = "";
+      box.classList.remove('glow');
+    });
+    verifyBtn.disabled = true;
+  }
+
+  boxes.forEach((box, idx) => {
+    box.addEventListener('input', () => {
+      if (box.value) {
+        box.classList.add('glow');
+        if (idx < boxes.length - 1) boxes[idx + 1].focus();
+      } else {
+        box.classList.remove('glow');
+      }
+      verifyBtn.disabled = ![...boxes].every(b => b.value);
+    });
+
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !box.value && idx > 0) {
+        boxes[idx - 1].focus();
+      }
+    });
+  });
+
+  let countdown = 30;
+  let timerInterval;
+
+  function startTimer() {
+    resendBtn.disabled = true;
+    countdown = 30;
+    timerSpan.textContent = `(${countdown}s)`;
+
+    timerInterval = setInterval(() => {
+      countdown--;
+      if (countdown > 0) {
+        timerSpan.textContent = `(${countdown}s)`;
+      } else {
+        clearInterval(timerInterval);
+        resendBtn.disabled = false;
+        timerSpan.textContent = "";
+      }
+    }, 1000);
+  }
+
+  startTimer();
+
+  resendBtn.addEventListener('click', async () => {
+    try {
+      const res = await fetch('/auth/resend-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        errorMsg.textContent = "";
+        clearBoxes();
+        startTimer();
+        // show modal for 5 seconds
+        resendModal.classList.remove('hidden');
+        setTimeout(() => {
+          resendModal.classList.add('hidden');
+        }, 5000);
+      } else {
+        errorMsg.textContent = data.error || "Failed to resend code";
+      }
+    } catch (err) {
+      console.error(err);
+      errorMsg.textContent = "Network error while resending code";
+    }
+  });
+
+  verifyBtn.addEventListener('click', async () => {
+    const code = [...boxes].map(b => b.value).join('');
+    try {
+      const res = await fetch('/auth/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        errorMsg.textContent = "";
+        clearBoxes();
+        window.location.href = "/auth/login";
+      } else {
+        errorMsg.textContent = data.error || "Verification failed";
+        clearBoxes();
+      }
+    } catch (err) {
+      console.error(err);
+      errorMsg.textContent = "Network error while verifying code";
+      clearBoxes();
+    }
+  });
+</script>
+
+</body>
+</html>

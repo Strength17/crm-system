@@ -1,0 +1,183 @@
+{
+  "info": {
+    "name": "CRM API — Cascade Suite",
+    "_postman_id": "cascade-suite",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login (cascade)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{BASE_URL}}/auth/login",
+        "body": { "mode": "raw", "raw": "{\"email\":\"{{EMAIL}}\",\"password\":\"{{PASSWORD}}\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Login OK', function () {",
+          "  pm.response.to.have.status(200);",
+          "  pm.environment.set('AUTH_TOKEN', pm.response.json().token);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Create Prospect",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/prospects",
+        "body": { "mode": "raw", "raw": "{\"name\":\"CascadeCo\",\"email\":\"cascade@example.com\",\"status\":\"new\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Prospect 201', function () {",
+          "  pm.response.to.have.status(201);",
+          "  pm.environment.set('C_PROSPECT', pm.response.json().id);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Create Interaction",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/interactions",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":{{C_PROSPECT}},\"channel\":\"email\",\"type\":\"outbound\",\"attempt_number\":1,\"content\":\"Cascade intro\",\"response_type\":\"opened\",\"success\":1}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Interaction 201', function () {",
+          "  pm.response.to.have.status(201);",
+          "  pm.environment.set('C_INTERACTION', pm.response.json().id);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Create Deal",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/deals",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":{{C_PROSPECT}},\"deal_value\":5000,\"stage\":\"initiated\",\"stage_reason\":\"Cascade test\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Deal 201', function () {",
+          "  pm.response.to.have.status(201);",
+          "  pm.environment.set('C_DEAL', pm.response.json().id);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Create Payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":{{C_DEAL}},\"amount\":5000,\"method\":\"manual\",\"status\":\"completed\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Payment 201', function () {",
+          "  pm.response.to.have.status(201);",
+          "  pm.environment.set('C_PAYMENT', pm.response.json().id);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Delete Prospect",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
+        "url": "{{BASE_URL}}/prospects/{{C_PROSPECT}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Delete Prospect', function () {",
+          "  pm.expect([200,204]).to.include(pm.response.code);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Get Interaction After Prospect Delete",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
+        "url": "{{BASE_URL}}/interactions/{{C_INTERACTION}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Interaction should be gone after prospect delete', function () {",
+          "  pm.expect([404]).to.include(pm.response.code);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Get Deal After Prospect Delete",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
+        "url": "{{BASE_URL}}/deals/{{C_DEAL}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Deal should be gone after prospect delete', function () {",
+          "  pm.expect([404]).to.include(pm.response.code);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Get Payment After Prospect Delete",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
+        "url": "{{BASE_URL}}/payments/{{C_PAYMENT}}"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Payment should be gone after prospect delete', function () {",
+          "  pm.expect([404]).to.include(pm.response.code);",
+          "});"
+        ] }
+      }]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "prospects_schema": [
+    {"name":"name","type":"Full Name"},
+    {"name":"email","type":"Email Address"},
+    {"name":"phone","type":"Phone"},
+    {"name":"website","type":"URL"},
+    {"name":"pain","type":"Custom List","values":["Slow onboarding","Low conversion","High churn","Manual processes"]},
+    {"name":"pain_score","type":"Number","min":1,"max":10},
+    {"name":"status","type":"Custom List","values":["new","contacted","negotiating","closed"]}
+  ],
+  "interactions_schema": [
+    {"name":"prospect_id","type":"Row Number"},
+    {"name":"channel","type":"Custom List","values":["email","phone","whatsapp"]},
+    {"name":"type","type":"Custom List","values":["inbound","outbound"]},
+    {"name":"attempt_number","type":"Number","min":1,"max":5},
+    {"name":"content","type":"Sentence"},
+    {"name":"response_type","type":"Custom List","values":["opened","replied","failed"]},
+    {"name":"success","type":"Custom List","values":[0,1]}
+  ],
+  "deals_schema": [
+    {"name":"prospect_id","type":"Row Number"},
+    {"name":"deal_value","type":"Number","min":100,"max":10000},
+    {"name":"stage","type":"Custom List","values":["initiated","negotiating","closed_won","closed_lost"]},
+    {"name":"reason_lost","type":"Custom List","values":["price","timing","not interested", null]}
+  ],
+  "payments_schema": [
+    {"name":"deal_id","type":"Row Number"},
+    {"name":"amount","type":"Number","min":10,"max":10000},
+    {"name":"method","type":"Custom List","values":["stripe","manual","api"]},
+    {"name":"status","type":"Custom List","values":["pending","completed"]}
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "info": {
+    "name": "CRM API — Race Suite",
+    "_postman_id": "race-suite",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Login (race)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{BASE_URL}}/auth/login",
+        "body": { "mode": "raw", "raw": "{\"email\":\"{{EMAIL}}\",\"password\":\"{{PASSWORD}}\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Login OK', function () {",
+          "  pm.response.to.have.status(200);",
+          "  pm.environment.set('AUTH_TOKEN', pm.response.json().token);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Create Prospect",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/prospects",
+        "body": { "mode": "raw", "raw": "{\"name\":\"RaceCo\",\"email\":\"race@example.com\",\"status\":\"new\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Prospect 201', function () {",
+          "  pm.response.to.have.status(201);",
+          "  pm.environment.set('R_PROSPECT', pm.response.json().id);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Concurrent Interactions A and B",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/interactions",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":{{R_PROSPECT}},\"channel\":\"email\",\"type\":\"outbound\",\"attempt_number\":1,\"content\":\"msg A\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Interaction A 201', function () {",
+          "  pm.response.to.have.status(201);",
+          "});"
+        ] }
+      }]
+    },
+    {
+      "name": "Concurrent Interactions B",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/interactions",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":{{R_PROSPECT}},\"channel\":\"phone\",\"type\":\"inbound\",\"attempt_number\":1,\"content\":\"msg B\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Interaction B 201', function () {",
+          "  pm.response.to.have.status(201);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "List Interactions and assert >= 2",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
+        "url": "{{BASE_URL}}/interactions"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Interactions list has at least two', function () {",
+          "  pm.response.to.have.status(200);",
+          "  var arr = pm.response.json();",
+          "  pm.expect(arr.length).to.be.at.least(2);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Create Deal",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/deals",
+        "body": { "mode": "raw", "raw": "{\"prospect_id\":{{R_PROSPECT}},\"deal_value\":2000,\"stage\":\"initiated\",\"stage_reason\":\"Race test\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Deal 201', function () {",
+          "  pm.response.to.have.status(201);",
+          "  pm.environment.set('R_DEAL', pm.response.json().id);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "Concurrent Payments A and B",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":{{R_DEAL}},\"amount\":1000,\"method\":\"stripe\",\"status\":\"pending\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Payment A 201', function () {",
+          "  pm.response.to.have.status(201);",
+          "});"
+        ] }
+      }]
+    },
+    {
+      "name": "Concurrent Payments B",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{BASE_URL}}/payments",
+        "body": { "mode": "raw", "raw": "{\"deal_id\":{{R_DEAL}},\"amount\":1000,\"method\":\"manual\",\"status\":\"completed\"}" }
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Payment B 201', function () {",
+          "  pm.response.to.have.status(201);",
+          "});"
+        ] }
+      }]
+    },
+
+    {
+      "name": "List Payments and assert >= 2",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
+        "url": "{{BASE_URL}}/payments"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Payments list has at least two', function () {",
+          "  pm.response.to.have.status(200);",
+          "  var arr = pm.response.json();",
+          "  pm.expect(arr.length).to.be.at.least(2);",
+          "});"
+        ] }
+      }]
+    }
+  ]
+}

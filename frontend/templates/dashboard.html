@@ -1,0 +1,257 @@
+{% extends "template.html" %}
+
+{% block title %}CRM Dashboard{% endblock %}
+
+{% block nav_dashboard %}bg-blue-50 text-blue-600{% endblock %}
+
+{% block root_attributes %}x-data="dashboardData()" x-init="init()"{% endblock %}
+
+{% block content %}
+<main class="p-4 sm:p-6 lg:p-8">
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900">Dashboard</h2>
+        <p class="mt-1 text-sm text-gray-600">Welcome back, <span x-text="user.name"></span>! Here's what's happening today.</p>
+    </div>
+
+    <!-- Metrics Cards -->
+    <div class="grid grid-cols-1 gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-4">
+        <!-- Total Prospects -->
+        <a href="{{ url_for('crm.prospects_page') }}" class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow relative group">
+            <div class="absolute top-4 right-4 p-1.5 rounded-md border border-gray-200 bg-white group-hover:border-blue-600 group-hover:bg-blue-50 transition-all">
+                <svg class="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+            </div>
+            <div class="flex items-center justify-between pr-8">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Total Prospects</p>
+                    <p class="mt-2 text-3xl font-bold text-gray-900" x-text="metrics.totalProspects"></p>
+                </div>
+                <div class="p-3 bg-blue-50 rounded-lg">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+
+        <!-- Active Deals -->
+        <a href="{{ url_for('crm.deals_page') }}" class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow relative group">
+            <div class="absolute top-4 right-4 p-1.5 rounded-md border border-gray-200 bg-white group-hover:border-green-600 group-hover:bg-green-50 transition-all">
+                <svg class="w-4 h-4 text-gray-400 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+            </div>
+            <div class="flex items-center justify-between pr-8">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Active Deals</p>
+                    <p class="mt-2 text-3xl font-bold text-gray-900" x-text="metrics.activeDeals"></p>
+                </div>
+                <div class="p-3 bg-green-50 rounded-lg">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+
+        <!-- Total Revenue -->
+        <a href="{{ url_for('crm.payments_page') }}" class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow relative group">
+            <div class="absolute top-4 right-4 p-1.5 rounded-md border border-gray-200 bg-white group-hover:border-purple-600 group-hover:bg-purple-50 transition-all">
+                <svg class="w-4 h-4 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+            </div>
+            <div class="flex items-center justify-between pr-8">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+                    <p class="mt-2 text-3xl font-bold text-gray-900" x-text="formatCurrency(metrics.totalRevenue)"></p>
+                </div>
+                <div class="p-3 bg-purple-50 rounded-lg">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+
+        <!-- Recent Interactions -->
+        <a href="{{ url_for('crm.interactions_page') }}" class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow relative group">
+            <div class="absolute top-4 right-4 p-1.5 rounded-md border border-gray-200 bg-white group-hover:border-orange-600 group-hover:bg-orange-50 transition-all">
+                <svg class="w-4 h-4 text-gray-400 group-hover:text-orange-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+            </div>
+            <div class="flex items-center justify-between pr-8">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Interactions</p>
+                    <p class="mt-2 text-3xl font-bold text-gray-900" x-text="metrics.recentInteractions"></p>
+                </div>
+                <div class="p-3 bg-orange-50 rounded-lg">
+                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="mb-4 flex items-center justify-end space-x-2">
+    <label for="prospectCount" class="text-sm font-medium text-gray-700">Show</label>
+    <select id="prospectCount" 
+            x-model="prospectCount" 
+            @change="fetchDataWithCount()" 
+            class="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+    </select>
+</div>
+
+    <!-- Recent Prospects Table -->
+    <div class="bg-white rounded-lg border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900">Recent Prospects</h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Website</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pain</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pain Score</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <template x-for="prospect in recentProspects" :key="prospect.id">
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="prospect.id"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" x-text="prospect.name"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600" x-text="prospect.website || '-'"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600" x-text="prospect.email"></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600" x-text="prospect.phone || '-'"></td>
+                            <td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" x-data="{ open: false }">
+                                <span
+                                    class="cursor-pointer"
+                                    :title="prospect.pain || '-'"
+                                    @click="open = true"
+                                    x-text="prospect.pain || '-'">
+                                </span>
+
+                                <!-- Mobile / Click modal -->
+                                <div
+                                    x-show="open"
+                                    x-cloak
+                                    @click.away="open = false"
+                                    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+                                    <div class="bg-white rounded-lg max-w-md w-full p-4">
+                                        <h4 class="text-sm font-semibold text-gray-900 mb-2">Prospect Pain</h4>
+                                        <p class="text-sm text-gray-700 whitespace-pre-wrap" x-text="prospect.pain || '-'"></p>
+                                        <div class="mt-4 text-right">
+                                            <button
+                                                @click="open = false"
+                                                class="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded">
+                                                Close
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="prospect.pain_score !== null ? prospect.pain_score + '/10' : '-'"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span :class="{
+                                    'bg-blue-100 text-blue-800': prospect.status === 'new',
+                                    'bg-yellow-100 text-yellow-800': prospect.status === 'contacted',
+                                    'bg-purple-100 text-purple-800': prospect.status === 'qualified',
+                                    'bg-red-100 text-red-800': prospect.status === 'not_qualified',
+                                    'bg-green-100 text-green-800': prospect.status === 'won',
+                                    'bg-gray-100 text-gray-800': prospect.status === 'lost'
+                                }" class="px-2 py-1 text-xs font-medium rounded-full" x-text="prospect.status"></span>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function dashboardData() {
+    return {
+        metrics: {
+            totalProspects: 0,
+            activeDeals: 0,
+            totalRevenue: 0,
+            recentInteractions: 0
+        },
+        recentProspects: [],
+
+        // Initialize prospectCount from localStorage or default
+        _prospectCount: localStorage.getItem('prospectCount') || 10,
+
+        // Getter/setter to bind with select and persist in localStorage
+        get prospectCount() {
+            return Number(this._prospectCount);
+        },
+        set prospectCount(val) {
+            this._prospectCount = Number(val);
+            localStorage.setItem('prospectCount', this._prospectCount);
+            this.fetchDataWithCount(); // immediately fetch with new count
+        },
+
+        init() {
+            // Initialize from localStorage
+            this._prospectCount = localStorage.getItem('prospectCount') || 5;
+
+            // Fetch initial data
+            this.fetchDataWithCount();
+
+            // Setup polling every 15 seconds, always using count from LS
+            if (window.GlobalPoller) {
+                window.GlobalPoller.register(() => this.fetchDataWithCount(), 15000);
+            } else {
+                setInterval(() => this.fetchDataWithCount(), 15000);
+            }
+        },
+        
+
+        async fetchDataWithCount() {
+            try {
+                const res = await fetch(`{{ url_for('crm.dashboard_data') }}?count=${this.prospectCount}`);
+                const data = await res.json();
+
+                this.user = data.user || { name: '', email: '' };
+                this.metrics.totalProspects = data.counts.prospects || 0;
+                this.metrics.activeDeals = data.counts.deals_attempted || 0;
+                this.metrics.totalRevenue = data.counts.payments_total ?? 0;
+                this.metrics.recentInteractions = data.counts.interactions_attempted || 0;
+                this.recentProspects = data.prospects || [];
+
+                console.log("Data with count:", this.prospectCount, this.recentProspects);
+            } catch (err) {
+                console.error("Error fetching dashboard data with count:", err);
+            }
+        },
+
+        formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+        }
+    }
+}
+</script>
+{% endblock %}
+
+<td class="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" x-text="prospect.pain || '-'"></td>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign In — CRM System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { --color-bg: #0f172a; }
+    .bg-app { background: var(--color-bg); }
+  </style>
+</head>
+<body class="bg-app min-h-screen flex items-center justify-center">
+
+  <div class="bg-white/10 p-8 rounded-xl shadow-lg w-full max-w-md text-center">
+    <!-- Logo placeholder -->
+    <a href="{{url_for('auth.index')}}" class="flex flex-col items-center mb-6">
+      <div class="flex justify-center mb-4">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="w-9 h-13 " />
+      </div>
+      <div class="text-white font-semibold text-lg mb-6">CRM System</div>
+    </a>
+
+    <h1 class="text-white text-3xl font-bold mb-6">Sign In</h1>
+    <form id="signinForm" class="space-y-4 text-left">
+      <input type="email" id="signinEmail" placeholder="Email Address"
+        class="w-full px-4 py-2 rounded-md bg-white/5 text-white border border-white/20 focus:outline-none focus:border-cyan-400" required>
+
+      <div class="relative">
+        <input type="password" id="signinPassword" placeholder="Password"
+          class="w-full px-4 py-2 rounded-md bg-white/5 text-white border border-white/20 focus:outline-none focus:border-cyan-400 pr-10" required>
+        <button type="button" onclick="togglePassword('signinPassword','signinIcon')"
+          class="absolute right-2 top-2 text-gray-400">
+          <svg id="signinIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path d="M2.458 12C3.732 7.943 7.523 5 12 5
+                     c4.477 0 8.268 2.943 9.542 7
+                     -1.274 4.057-5.065 7-9.542 7
+                     -4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+        </button>
+      </div>
+
+      <button id="signinBtn" type="submit" disabled
+        class="w-full py-3 rounded-md bg-gradient-to-r from-cyan-400 to-blue-400 text-black font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+        Sign In
+      </button>
+    </form>
+
+    <div class="mt-4 flex justify-between text-sm text-gray-400">
+      <a href="{{ url_for('auth.request_reset') }}" class="hover:text-white">Forgot password?</a>
+      <a href="{{ url_for('auth.signup_page') }}" class="hover:text-white">No account? Sign up</a>
+    </div>
+  </div>
+
+  <!-- Top notification bar -->
+  <div id="dialog" class="hidden fixed top-0 left-0 right-0 flex justify-center mt-4 z-50">
+    <div id="dialogBox" class="px-6 py-3 rounded-md shadow-lg text-white"></div>
+  </div>
+  
+<script>
+  function togglePassword(fieldId, iconId) {
+    const field = document.getElementById(fieldId);
+    const icon = document.getElementById(iconId);
+    if (field.type === "password") {
+      field.type = "text";
+      icon.innerHTML = `<path d="M13.875 18.825A10.05 10.05 0 0112 19
+                         c-4.477 0-8.268-2.943-9.542-7
+                         a9.956 9.956 0 012.642-4.362M9.88 9.88
+                         a3 3 0 104.24 4.24"/><path d="M3 3l18 18"/>`;
+    } else {
+      field.type = "password";
+      icon.innerHTML = `<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path d="M2.458 12C3.732 7.943 7.523 5 12 5
+                                 c4.477 0 8.268-2.943 9.542 7
+                                 -1.274 4.057-5.065 7-9.542 7
+                                 -4.477 0-8.268-2.943-9.542-7z"/>`;
+    }
+  }
+
+  // Check if user is already logged in (token exists)
+  window.addEventListener('load', () => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      // TODO: verify token validity with backend before redirecting
+      window.location.href = "/crm/dashboard";
+    }
+  });
+
+  const signinForm = document.getElementById('signinForm');
+  const signinBtn = document.getElementById('signinBtn');
+  const dialog = document.getElementById('dialog');
+  const dialogBox = document.getElementById('dialogBox');
+
+  // Enable submit button when form is valid
+  signinForm.addEventListener('input', () => {
+    signinBtn.disabled = !signinForm.checkValidity();
+  });
+
+  signinForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('signinEmail').value;
+    const password = document.getElementById('signinPassword').value;
+
+    try {
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        // Save token in localStorage for persistence
+        localStorage.setItem('authToken', data.token);
+
+        // Show success message
+        dialogBox.textContent = "Login successful! Redirecting...";
+        dialogBox.className = "bg-green-500 text-white px-6 py-3 rounded-md shadow-lg";
+        dialog.classList.remove('hidden');
+
+        // Redirect after a short delay
+        setTimeout(() => {
+          dialog.classList.add('hidden');
+          window.location.href = "/crm/dashboard"; // adjust as needed
+        }, 2500);
+      } else {
+        // Show error message
+        dialogBox.textContent = data.error || "Login failed";
+        dialogBox.className = "bg-red-500 text-white px-6 py-3 rounded-md shadow-lg";
+        dialog.classList.remove('hidden');
+        setTimeout(() => {
+          dialog.classList.add('hidden');
+        }, 5000);
+      }
+    } catch (err) {
+      console.error(err);
+      dialogBox.textContent = "Network error. Please try again.";
+      dialogBox.className = "bg-red-500 text-white px-6 py-3 rounded-md shadow-lg";
+      dialog.classList.remove('hidden');
+      setTimeout(() => {
+        dialog.classList.add('hidden');
+      }, 5000);
+    }
+  });
+</script>
+</body>
+</html>
