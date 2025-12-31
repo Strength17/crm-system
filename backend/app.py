@@ -3,7 +3,7 @@ from flask_cors import CORS
 from backend.db import close_db, get_db
 from backend.init_db import DatabaseInitializer  # aligned to renamed file
 from backend.crud import CRUDManager
-from docs_registry import DOCS
+from backend.docs_registry import DOCS
 from backend.auth import auth_bp  # <-- import your consolidated AUTH blueprint
 from backend.crm import crm_bp   # <-- import your consolidated CRM blueprint
 from dotenv import load_dotenv
