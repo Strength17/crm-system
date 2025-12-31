@@ -5,7 +5,7 @@ import jwt, datetime, re, os, secrets, hmac, hashlib
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from dotenv import load_dotenv
-from db import get_db
+from backend.db import get_db
 
 load_dotenv()
 

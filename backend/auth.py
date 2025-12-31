@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify,  g, render_template
 import jwt
-from db import get_db
+from backend.db import get_db
 import random, secrets, datetime
-from helpers import (
+from backend.helpers import (
     SECRET_KEY,
     hash_password,
     verify_password,

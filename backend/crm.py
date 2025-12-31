@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
-from db import get_db
-from helpers import token_required, parse_request_data, check_forbidden
+from backend.db import get_db
+from backend.helpers import token_required, parse_request_data, check_forbidden
 import re, sqlite3
 
 crm_bp = Blueprint("crm", __name__, url_prefix="/crm")

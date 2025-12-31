@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, redirect, request, g, url_for, make_response, session
 from flask_cors import CORS
-from db import close_db, get_db
+from backend.db import close_db, get_db
 from init_db import DatabaseInitializer  # aligned to renamed file
-from crud import CRUDManager
+from backend.crud import CRUDManager
 from docs_registry import DOCS
-from auth import auth_bp  # <-- import your consolidated AUTH blueprint
-from crm import crm_bp   # <-- import your consolidated CRM blueprint
+from backend.auth import auth_bp  # <-- import your consolidated AUTH blueprint
+from backend.crm import crm_bp   # <-- import your consolidated CRM blueprint
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path="C:/MyMVP/.env")

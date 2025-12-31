@@ -1,7 +1,7 @@
 # backend/crud.py
 from flask import request, jsonify, g
-from db import get_db
-from docs_registry import DOCS
+from backend.db import get_db
+from backend.docs_registry import DOCS
 import re
 
 # ============================================================
