@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, redirect, request, g, url_for, make_response, session
 from flask_cors import CORS
 from backend.db import close_db, get_db
-from init_db import DatabaseInitializer  # aligned to renamed file
+from backend.init_db import DatabaseInitializer  # aligned to renamed file
 from backend.crud import CRUDManager
 from docs_registry import DOCS
 from backend.auth import auth_bp  # <-- import your consolidated AUTH blueprint
