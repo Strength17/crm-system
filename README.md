@@ -58,8 +58,8 @@ This project helps small teams or solo founders manage prospects, deals, payment
 
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/yourusername/crm-dashboard.git
-   cd crm-dashboard
+   git clone https://github.com/Strength17/crm-system.git
+   cd crm-system
    ```
 
 2. **Create virtual environment**
@@ -75,7 +75,7 @@ This project helps small teams or solo founders manage prospects, deals, payment
 
 4. **Initialize database**
    ```bash
-   flask init-db
+   python init-db
    ```
 
 5. **Run the app**
